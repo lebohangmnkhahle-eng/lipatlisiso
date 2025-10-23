@@ -1,0 +1,19 @@
+# bilingual_sites.txt
+"""
+South African Government:
+- www.gov.za (some docs in Sesotho)
+- www.dbe.gov.za (education)
+- Free State provincial websites
+
+Lesotho Government:
+- www.gov.ls
+- www.education.gov.ls
+
+News:
+- www.lesothotimes.com
+- South African news sites with Sesotho sections
+
+Educational:
+- University of Free State
+- National University of Lesotho
+"""
