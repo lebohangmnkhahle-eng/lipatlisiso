@@ -44,12 +44,13 @@ def evaluate_model(model, test_data, model_type='function', tokenizer=None):
     total_chars = sum(len(r) for r in references)
     cer = sum(edit_distances) / total_chars if total_chars > 0 else 0
 
-    return {
+    scores = {
         'bleu': bleu_score.score,
         'chrf': chrf_score.score,
         'avg_edit_distance': avg_edit_dist,
         'character_error_rate': cer * 100
     }
+    return scores, predictions
 
 if __name__ == '__main__':
     # Load test data
@@ -57,24 +58,37 @@ if __name__ == '__main__':
 
     results = {}
 
+    def save_predictions(predictions, filename):
+        with open(os.path.join('results', filename), 'w') as f:
+            for pred in predictions:
+                f.write(pred + '\n')
+
     # Evaluate identity baseline
-    results['identity'] = evaluate_model(identity_baseline, test_df, model_type='function')
+    results['identity'], identity_preds = evaluate_model(identity_baseline, test_df, model_type='function')
+    save_predictions(identity_preds, 'identity_predictions.txt')
 
     # Evaluate rule-based normalizer
     normalizer = SesothoNormalizer()
-    results['rule_based'] = evaluate_model(normalizer, test_df, model_type='normalizer')
+    results['rule_based'], rule_based_preds = evaluate_model(normalizer, test_df, model_type='normalizer')
+    save_predictions(rule_based_preds, 'rule_based_predictions.txt')
 
     # Evaluate ByT5 model
     # Note: This assumes training has produced a checkpoint.
-    # If not, this part will fail.
+    from huggingface_hub.errors import HFValidationError
     try:
-        model_path = './checkpoints/byt5-small'
+        model_path = os.path.abspath('./checkpoints/byt5-small')
         byt5_model = T5ForConditionalGeneration.from_pretrained(model_path)
         byt5_tokenizer = AutoTokenizer.from_pretrained(model_path)
-        results['byt5'] = evaluate_model(byt5_model, test_df, model_type='transformer', tokenizer=byt5_tokenizer)
-    except OSError:
-        print("ByT5 model not found. Skipping evaluation.")
+        results['byt5'], byt5_preds = evaluate_model(byt5_model, test_df, model_type='transformer', tokenizer=byt5_tokenizer)
+        save_predictions(byt5_preds, 'byt5_predictions.txt')
+    except (OSError, HFValidationError):
+        print("ByT5 model not found or invalid. Skipping evaluation.")
         results['byt5'] = { 'bleu': 0, 'chrf': 0, 'avg_edit_distance': 'N/A', 'character_error_rate': 'N/A' }
+        save_predictions([], 'byt5_predictions.txt') # Save empty file
+
+    # Placeholder for LSTM
+    results['lstm'] = { 'bleu': 0, 'chrf': 0, 'avg_edit_distance': 'N/A', 'character_error_rate': 'N/A' }
+    save_predictions([], 'lstm_predictions.txt')
 
 
     # Print and save results
