@@ -73,3 +73,27 @@ for book in books:
 df = pd.DataFrame(all_verses)
 df.to_csv('data/raw/bible_aligned.csv', index=False)
 print(f"Total verses: {len(df)}")
+
+# Day 6: Manual validation
+# Sample 10 random pairs for validation
+sample = df.sample(min(10, len(df)))
+validated_data = []
+
+for index, row in sample.iterrows():
+    print(f"Source: {row['source']}")
+    print(f"Target: {row['target']}")
+    while True:
+        feedback = input("Is this alignment correct, misaligned, identical, or other? ").lower()
+        if feedback in ['correct', 'misaligned', 'identical', 'other']:
+            break
+        print("Invalid input. Please enter 'correct', 'misaligned', 'identical', or 'other'.")
+    validated_data.append({
+        'id': row['id'],
+        'source': row['source'],
+        'target': row['target'],
+        'validation': feedback
+    })
+
+validated_sample = pd.DataFrame(validated_data)
+validated_sample.to_csv('data/raw/bible_aligned_validated_sample.csv', index=False)
+print("Validation results saved to data/raw/bible_aligned_validated_sample.csv")
