@@ -1,108 +1,94 @@
 # rule_based_normalizer.py
 
 import re
-from typing import List, Tuple
+from typing import Tuple, List
 
-class SesothoNormalizer:
+class SesothoRuleBasedNormalizer:
+    """
+    Basic rule-based normalizer for SA -> Lesotho Sesotho
+    Implements a set of transformation rules. Replacements preserve capitalization.
+    """
+
     def __init__(self):
-        self.rules = self._initialize_rules()
-
-    def _initialize_rules(self) -> List[Tuple]:
-        """
-        Define transformation rules
-        Each rule: (name, pattern, replacement, exceptions)
-        """
-        rules = [
-            # Copulative consolidation
-            ('cop_ke_a', r'\bKe\s+a\s+', 'Kea ', []),
-            ('cop_o_a', r'\bo\s+a\s+', 'oa ', []),
-            ('cop_re_a', r'\bRe\s+a\s+', 'Rea ', []),
-            ('cop_le_a', r'\bLe\s+a\s+', 'Lea ', []),
-            ('cop_ba_a', r'\bBa\s+a\s+', 'Baa ', []),
-
-            # Noun class prefixes (with exceptions)
-            ('prefix_dijo', r'\bdijo\b', 'lijo', []),
-            ('prefix_diphoofolo', r'\bdiphoofolo\b', 'liphoofolo', []),
-            ('prefix_dibuka', r'\bdibuka\b', 'libuka', []),
-            # Generic di -> li (careful with exceptions)
-            ('prefix_di_generic', r'\bdi([a-z]+)\b',
-             lambda m: f'li{m.group(1)}' if m.group(0) not in ['dipale', 'dimela', 'dinaha'] else m.group(0),
-             []),
-
-            # Consonant clusters
-            ('cons_ngwana', r'\bngwana\b', 'ngoana', []),
-            ('cons_ngwaneso', r'\bngwaneso\b', 'ngoaneso', []),
-
-            # Possessives (context-dependent - simplified)
-            ('poss_ya_hao', r'ya\s+hao\b', 'ea hao', []),
-            ('poss_ya_rona', r'ya\s+rona\b', 'ea rona', []),
+        self.rules = [
+            self.rule_1_copulative_ke_a,
+            self.rule_2_copulative_o_a,
+            self.rule_3_noun_prefix_di_li,
+            self.rule_4_consonant_ngw_ngo,
+            self.rule_5_possessive_ya_ea,
         ]
-        return rules
+        self.transformation_log: List[dict] = []
 
-    def normalize(self, text: str) -> str:
-        """Apply all transformation rules"""
+    # helper to preserve capitalization of replacement
+    def _preserve_case_repl(self, replacement: str):
+        def repl(match):
+            matched_text = match.group(0)
+            # If first char of the match is uppercase, capitalize replacement
+            if matched_text and matched_text[0].isupper():
+                return replacement[0].upper() + replacement[1:]
+            else:
+                return replacement
+        return repl
+
+    def rule_1_copulative_ke_a(self, text: str) -> Tuple[str, bool]:
+        """Rule 1: Copulative consolidation 'Ke a' -> 'Kea' (and lowercase)"""
+        pattern = re.compile(r'\b([Kk]e)\s+a\s+', flags=re.UNICODE)
+        new_text, n = pattern.subn(r'\1a ', text)
+        changed = n > 0
+        if changed:
+            self.transformation_log.append({'rule': 'copulative_ke_a', 'pattern': r'\b[Kk]e\s+a', 'replacement': r'\1a'})
+        return new_text, changed
+
+    def rule_2_copulative_o_a(self, text: str) -> Tuple[str, bool]:
+        """Rule 2: Copulative consolidation 'o a' -> 'oa' (and uppercase)"""
+        pattern = re.compile(r'\b([oO])\s+a\s+', flags=re.UNICODE)
+        new_text, n = pattern.subn(r'\1a ', text)
+        changed = n > 0
+        if changed:
+            self.transformation_log.append({'rule': 'copulative_o_a', 'pattern': r'\b[oO]\s+a', 'replacement': r'\1a'})
+        return new_text, changed
+
+    def rule_3_noun_prefix_di_li(self, text: str) -> Tuple[str, bool]:
+        """Rule 3: Noun class prefix 'dijo' -> 'lijo'"""
+        words = {'dijo': 'lijo', 'diphoofolo': 'liphoofolo', 'dibuka': 'libuka'}
+        new_text = text
+        changed = False
+        for sa_word, les_word in words.items():
+            pattern = re.compile(r'\b' + sa_word + r'\b', flags=re.IGNORECASE)
+            if pattern.search(new_text):
+                new_text = pattern.sub(self._preserve_case_repl(les_word), new_text)
+                changed = True
+                self.transformation_log.append({'rule': 'noun_prefix_di_li', 'pattern': sa_word, 'replacement': les_word})
+        return new_text, changed
+
+    def rule_4_consonant_ngw_ngo(self, text: str) -> Tuple[str, bool]:
+        """Rule 4: Consonant cluster 'ngwana' -> 'ngoana'"""
+        transformations = {'ngwana': 'ngoana', 'ngwaneso': 'ngoaneso', 'ngwanaka': 'ngoanaka'}
+        new_text = text
+        changed = False
+        for sa_form, les_form in transformations.items():
+            pattern = re.compile(r'\b' + sa_form + r'\b', flags=re.IGNORECASE)
+            if pattern.search(new_text):
+                new_text = pattern.sub(self._preserve_case_repl(les_form), new_text)
+                changed = True
+                self.transformation_log.append({'rule': 'consonant_ngw_ngo', 'pattern': sa_form, 'replacement': les_form})
+        return new_text, changed
+
+    def rule_5_possessive_ya_ea(self, text: str) -> Tuple[str, bool]:
+        """Rule 5: Possessive marker 'ya <poss>' -> 'ea <poss>'"""
+        pattern = re.compile(r'\b(ya)\s+(hao|rona|bona)\b', flags=re.IGNORECASE)
+        def repl(m):
+            prefix = 'Ea' if m.group(1).isupper() else 'ea'
+            return f'{prefix} {m.group(2)}'
+        new_text, n = pattern.subn(repl, text)
+        changed = n > 0
+        if changed:
+            self.transformation_log.append({'rule': 'possessive_ya_ea', 'pattern': r'\bya (hao|rona|bona)\b', 'replacement': 'ea <possessive>'})
+        return new_text, changed
+
+    def normalize(self, text: str) -> Tuple[str, List[dict]]:
+        self.transformation_log = []
         normalized = text
-        applied_rules = []
-
-        for rule_name, pattern, replacement, exceptions in self.rules:
-            # Check if text matches pattern
-            if re.search(pattern, normalized):
-                # Apply transformation
-                new_text = re.sub(pattern, replacement, normalized)
-                if new_text != normalized:
-                    applied_rules.append(rule_name)
-                    normalized = new_text
-
-        return normalized, applied_rules
-
-    def generate_synthetic_pairs(self, sa_sentences: List[str]) -> List[dict]:
-        """Generate synthetic parallel corpus"""
-        synthetic = []
-
-        for i, sent in enumerate(sa_sentences):
-            normalized, rules = self.normalize(sent)
-
-            # Only keep if something changed
-            if normalized != sent:
-                synthetic.append({
-                    'id': f'synth_{i:06d}',
-                    'source': sent,
-                    'target': normalized,
-                    'source_type': 'synthetic',
-                    'rules_applied': ','.join(rules),
-                    'num_transformations': len(rules)
-                })
-
-        return synthetic
-
-import pandas as pd
-import random
-
-def load_monolingual(filepath='data/raw/sa_monolingual.txt'):
-    with open(filepath, 'r', encoding='utf-8') as f:
-        return [line.strip() for line in f if line.strip()]
-
-if __name__ == '__main__':
-    # Day 6: Generate and validate
-    normalizer = SesothoNormalizer()
-    sa_sentences = load_monolingual()
-    synthetic_pairs = normalizer.generate_synthetic_pairs(sa_sentences)
-
-    df_synthetic = pd.DataFrame(synthetic_pairs)
-
-    # Manual validation of 200 samples if we have enough data
-    if len(df_synthetic) > 200:
-        sample = df_synthetic.sample(200)
-    else:
-        sample = df_synthetic
-
-    # Mark as correct/incorrect
-    # Calculate accuracy: expect 60-75%
-    # For now, we will just save the sample for manual inspection
-    sample.to_csv('data/raw/synthetic_pairs_sample_for_validation.csv', index=False)
-
-    # Keep only high-confidence pairs (for now, all pairs)
-    df_synthetic.to_csv('data/raw/synthetic_pairs.csv', index=False)
-
-    print(f"Generated {len(df_synthetic)} synthetic pairs.")
-    print("A sample for validation has been saved to data/raw/synthetic_pairs_sample_for_validation.csv")
+        for rule_func in self.rules:
+            normalized, _ = rule_func(normalized)
+        return normalized, self.transformation_log
