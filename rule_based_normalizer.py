@@ -78,7 +78,8 @@ class SesothoRuleBasedNormalizer:
         """Rule 5: Possessive marker 'ya <poss>' -> 'ea <poss>'"""
         pattern = re.compile(r'\b(ya)\s+(hao|rona|bona)\b', flags=re.IGNORECASE)
         def repl(m):
-            prefix = 'Ea' if m.group(1).isupper() else 'ea'
+            # preserve capitalization of 'ya' -> 'ea' by checking the first character
+            prefix = 'Ea' if m.group(1)[0].isupper() else 'ea'
             return f'{prefix} {m.group(2)}'
         new_text, n = pattern.subn(repl, text)
         changed = n > 0
