@@ -43,3 +43,23 @@ def test_no_midword_change(normalizer):
     out, log = normalizer.normalize(s)
     assert out == s
     assert all(entry['rule'] != 'possessive_ya_ea' for entry in log)
+
+def test_noun_prefix_dijo_specific(normalizer):
+    out, log = normalizer.normalize("Dijo di monate")
+    assert out == "Lijo li monate"
+    assert any(entry['rule'] == 'noun_prefix_di_li' for entry in log)
+
+def test_noun_prefix_dijo_generic(normalizer):
+    out, log = normalizer.normalize("dipuo tse pedi")
+    assert out == "lipuo tse pedi"
+    assert any(entry['rule'] == 'noun_prefix_di_li_generic' for entry in log)
+
+def test_noun_prefix_dijo_exception(normalizer):
+    out, log = normalizer.normalize("dipale tsa rona")
+    assert out == "dipale tsa rona"
+    assert not any(entry['rule'] == 'noun_prefix_di_li_generic' for entry in log)
+
+def test_consonant_ngwana_capitalized(normalizer):
+    out, log = normalizer.normalize("Ngwana o a lla")
+    assert out == "Ngoana oa lla"
+    assert any(entry['rule'] == 'consonant_ngw_ngo' for entry in log)
