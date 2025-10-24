@@ -1,0 +1,13 @@
+pandas
+python-Levenshtein
+streamlit
+beautifulsoup4
+requests
+simpledorff
+scipy
+seaborn
+matplotlib
+pytest
+# optional / development:
+# flake8
+# ruff
