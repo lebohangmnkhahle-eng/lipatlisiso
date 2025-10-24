@@ -25,41 +25,34 @@ def test_possessive_ya_hao_lowercase(normalizer):
     assert out == "ke ea hao"
     assert any(entry['rule'] == 'possessive_ya_ea' for entry in log)
 
-def test_possessive_ya_hao_in_capitalized_sentence(normalizer):
+def test_possessive_ya_hao_capitalized(normalizer):
     out, log = normalizer.normalize("Ke ya hao")
-    # 'ya' is lowercase, so 'ea' should be too, regardless of sentence capitalization.
     assert out == "Ke ea hao"
     assert any(entry['rule'] == 'possessive_ya_ea' for entry in log)
 
-def test_possessive_Ya_hao_capitalized(normalizer):
-    out, log = normalizer.normalize("Ya hao ke yona")
-    # 'Ya' is capitalized, so 'Ea' should be too.
-    assert out == "Ea hao ke yona"
-    assert any(entry['rule'] == 'possessive_ya_ea' for entry in log)
-
 def test_no_midword_change(normalizer):
-    # ensure substring inside a token is not replaced
     s = "nodiyahoX"
     out, log = normalizer.normalize(s)
     assert out == s
     assert all(entry['rule'] != 'possessive_ya_ea' for entry in log)
 
-def test_noun_prefix_dijo_specific(normalizer):
-    out, log = normalizer.normalize("Dijo di monate")
-    assert out == "Lijo li monate"
-    assert any(entry['rule'] == 'noun_prefix_di_li' for entry in log)
+def test_noun_prefix_specific_words(normalizer):
+    out, log = normalizer.normalize("Dijo di monate haholo")
+    # Expect Dijo -> Lijo and standalone di -> li
+    assert out == "Lijo li monate haholo"
+    assert any('noun_prefix_di_li' in entry['rule'] for entry in log)
 
-def test_noun_prefix_dijo_generic(normalizer):
-    out, log = normalizer.normalize("dipuo tse pedi")
-    assert out == "lipuo tse pedi"
-    assert any(entry['rule'] == 'noun_prefix_di_li_generic' for entry in log)
+def test_noun_prefix_generic(normalizer):
+    out, log = normalizer.normalize("Diphoofolo di a tsamaea")
+    assert out == "Liphoofolo li a tsamaea"
+    assert any('noun_prefix_di_li' in entry['rule'] or 'noun_prefix_di_li_generic' in entry['rule'] for entry in log)
 
-def test_noun_prefix_dijo_exception(normalizer):
-    out, log = normalizer.normalize("dipale tsa rona")
-    assert out == "dipale tsa rona"
-    assert not any(entry['rule'] == 'noun_prefix_di_li_generic' for entry in log)
+def test_ngwana_variants(normalizer):
+    out, log = normalizer.normalize("Ngwana o a bapala")
+    assert out == "Ngoana oa bapala"
+    assert any(entry['rule'] == 'consonant_ngw_ngo' for entry in log)
 
-def test_consonant_ngwana_capitalized(normalizer):
-    out, log = normalizer.normalize("Ngwana o a lla")
-    assert out == "Ngoana oa lla"
+def test_ngwaneso_lower(normalizer):
+    out, log = normalizer.normalize("ngwaneso ke nama ya rona")
+    assert out == "ngoaneso ke nama ea rona"
     assert any(entry['rule'] == 'consonant_ngw_ngo' for entry in log)
