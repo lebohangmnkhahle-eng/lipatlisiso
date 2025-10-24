@@ -1,43 +1,17 @@
 *** Begin Patch
-*** Add File: tests/test_rules.py
-+import pytest
-+from rules import SesothoRuleBasedNormalizer
-+
-+@pytest.fixture
-+def normalizer():
-+    return SesothoRuleBasedNormalizer()
-+
-+def test_ke_a_capitalized(normalizer):
-+    out, log = normalizer.normalize("Ke a sebetsa kajeno")
-+    assert out == "Kea sebetsa kajeno"
-+    assert any(entry['rule'] == 'copulative_ke_a' for entry in log)
-+
-+def test_ke_a_lowercase(normalizer):
-+    out, log = normalizer.normalize("ke a sebetsa kajeno")
-+    assert out == "kea sebetsa kajeno"
-+    assert any(entry['rule'] == 'copulative_ke_a' for entry in log)
-+
-+def test_o_a_lowercase(normalizer):
-+    out, log = normalizer.normalize("o a bapala")
-+    assert out == "oa bapala"
-+    assert any(entry['rule'] == 'copulative_o_a' for entry in log)
-+
-+def test_possessive_ya_hao_lowercase(normalizer):
-+    out, log = normalizer.normalize("ke ya hao")
-+    assert out == "ke ea hao"
-+    assert any(entry['rule'] == 'possessive_ya_ea' for entry in log)
-+
-+def test_possessive_ya_hao_capitalized(normalizer):
-+    out, log = normalizer.normalize("Ke ya hao")
-+    # capital-preserving replacement should produce "Ke Ea hao"
-+    assert out == "Ke Ea hao"
-+    assert any(entry['rule'] == 'possessive_ya_ea' for entry in log)
-+
-+def test_no_midword_change(normalizer):
-+    # ensure substring inside a token is not replaced
-+    s = "nodiyahoX"
-+    out, log = normalizer.normalize(s)
-+    assert out == s
-+    assert all(entry['rule'] != 'possessive_ya_ea' for entry in log)
+*** Add File: requirements.txt
++pandas
++python-Levenshtein
++streamlit
++beautifulsoup4
++requests
++simpledorff
++scipy
++seaborn
++matplotlib
++pytest
++# optional / development:
++# flake8
++# ruff
 +
 *** End Patch
