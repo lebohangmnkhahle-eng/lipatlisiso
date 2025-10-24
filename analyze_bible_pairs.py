@@ -7,7 +7,7 @@ import re
 df = pd.read_csv('data/raw/bible_pairs.csv', dtype=str).fillna('')
 
 print(f"Total verse pairs collected: {len(df)}")
-print(f"\nBooks covered:")
+print("\nBooks covered:")
 print(df['book'].value_counts())
 
 # Analyze differences
@@ -34,4 +34,4 @@ print(f"\nCopulative differences found in {(df['sa_copulatives'] > 0).sum()} ver
 df.to_csv('data/processed/bible_pairs_analyzed.csv', index=False)
 
 print("\n✅ Bible extraction complete!")
-print(f"📁 Saved to: data/processed/bible_pairs_analyzed.csv")
+print("📁 Saved to: data/processed/bible_pairs_analyzed.csv")

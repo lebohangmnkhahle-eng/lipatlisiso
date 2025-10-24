@@ -8,6 +8,11 @@ scipy
 seaborn
 matplotlib
 pytest
-# optional / development:
++# Linting and coverage tools
++ruff
++pytest-cov
++coverage
++codecov
++# optional / development:
 # flake8
 # ruff

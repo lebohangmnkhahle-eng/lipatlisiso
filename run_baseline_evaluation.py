@@ -57,7 +57,7 @@ for i, (source, pred, ref) in enumerate(zip(test_df['source'], rule_based_predic
 print(f"Total errors: {len(errors)} / {len(test_df)} ({len(errors)/len(test_df)*100:.1f}%)")
 
 if errors:
-    print(f"\nSample errors (first 5):")
+    print("\nSample errors (first 5):")
     for i, error in enumerate(errors[:5], 1):
         print(f"\n{i}. Source: {error['source']}")
         print(f"   Predicted: {error['prediction']}")
@@ -71,4 +71,4 @@ results_df = pd.DataFrame([
 ])
 results_df.to_csv('results/baseline_evaluation.csv', index=False)
 
-print(f"\n✅ Results saved to: results/baseline_evaluation.csv")
+print("\n✅ Results saved to: results/baseline_evaluation.csv")

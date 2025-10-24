@@ -1,6 +1,7 @@
 # combine_data.py
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 # Load Bible pairs
 df_bible = pd.read_csv('data/raw/bible_pairs.csv').reset_index(drop=True)
@@ -21,11 +22,10 @@ print(f"  Bible: {len(df_bible)}")
 print(f"  Synthetic: {len(df_synthetic)}")
 
 # Create simple train/test split
-from sklearn.model_selection import train_test_split
 
 train, test = train_test_split(df_all, test_size=0.2, random_state=42)
 
-print(f"\nSplit:")
+print("\nSplit:")
 print(f"  Train: {len(train)}")
 print(f"  Test: {len(test)}")
 
@@ -33,4 +33,4 @@ print(f"  Test: {len(test)}")
 train.to_csv('data/splits/train.tsv', sep='\t', index=False)
 test.to_csv('data/splits/test.tsv', sep='\t', index=False)
 
-print(f"\n✅ Data combined and split")
+print("\n✅ Data combined and split")

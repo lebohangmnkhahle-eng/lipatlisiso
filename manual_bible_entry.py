@@ -36,12 +36,14 @@ def main():
 
     while True:
         book = get_input("Book", last_book)
-        if book is None: break
+        if book is None:
+            break
 
         while True:
             try:
                 chapter_str = get_input("Chapter", last_chapter)
-                if chapter_str is None: return
+                if chapter_str is None:
+                    return
                 chapter = int(chapter_str)
                 break
             except ValueError:
@@ -50,20 +52,24 @@ def main():
         while True:
             try:
                 verse_num_str = get_input("Verse Number")
-                if verse_num_str is None: return
+                if verse_num_str is None:
+                    return
                 verse_num = int(verse_num_str)
                 break
             except ValueError:
                 print("Invalid input. Please enter a number for the verse.")
 
         sa_text = get_input("SA Text")
-        if sa_text is None: break
+        if sa_text is None:
+            break
 
         lesotho_text = get_input("Lesotho Text")
-        if lesotho_text is None: break
+        if lesotho_text is None:
+            break
 
         notes = get_input("Notes (optional)")
-        if notes is None: break
+        if notes is None:
+            break
 
         # Append new data and save
         new_entry = pd.DataFrame([{

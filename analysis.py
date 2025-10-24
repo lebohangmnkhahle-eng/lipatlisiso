@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
-import seaborn as sns
 import simpledorff
 import os
 import re
@@ -46,7 +45,6 @@ def compare_systems(ratings_df):
     rule_scores = ratings_df[ratings_df['system']=='Rule-based']['overall']
 
     # Friedman test for repeated measures
-    from scipy.stats import friedmanchisquare
 
     # We need to structure the data for Friedman test: groups are the systems
     # and blocks are the evaluators/items. For simplicity with this data,
@@ -58,10 +56,12 @@ def compare_systems(ratings_df):
     # Effect size (Cohen's d)
     def cohens_d(group1, group2):
         n1, n2 = len(group1), len(group2)
-        if n1 + n2 - 2 == 0: return 0.0
+        if n1 + n2 - 2 == 0:
+            return 0.0
         var1, var2 = np.var(group1, ddof=1), np.var(group2, ddof=1)
         pooled_std = np.sqrt(((n1-1)*var1 + (n2-1)*var2) / (n1+n2-2))
-        if pooled_std == 0: return 0.0
+        if pooled_std == 0:
+            return 0.0
         return (np.mean(group1) - np.mean(group2)) / pooled_std
 
     d = cohens_d(byt5_scores, rule_scores)
@@ -136,7 +136,8 @@ def create_visualizations(auto_results_df, human_results_df, error_counts_dict):
     # 3. Error type distribution
     if error_counts_dict:
         fig, axes = plt.subplots(1, len(error_counts_dict), figsize=(8 * len(error_counts_dict), 6), sharey=True)
-        if len(error_counts_dict) == 1: axes = [axes]
+        if len(error_counts_dict) == 1:
+            axes = [axes]
         for ax, (system, counts) in zip(axes, error_counts_dict.items()):
             counts.plot(kind='barh', ax=ax)
             ax.set_xlabel('Count')

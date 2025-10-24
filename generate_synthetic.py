@@ -2,6 +2,7 @@
 
 from rules import SesothoRuleBasedNormalizer
 import pandas as pd
+from collections import Counter
 
 # Load normalizer
 normalizer = SesothoRuleBasedNormalizer()
@@ -24,7 +25,7 @@ for i, sa_sent in enumerate(sa_sentences):
             'source': sa_sent,
             'target': les_sent,
             'source_type': 'synthetic',
-            'rules_applied': ','.join([l['rule'] for l in log]),
+            'rules_applied': ','.join([log_entry['rule'] for log_entry in log]),
             'num_transformations': len(log)
         })
 
@@ -32,12 +33,11 @@ for i, sa_sent in enumerate(sa_sentences):
 df_synthetic = pd.DataFrame(synthetic_pairs)
 
 print(f"Generated {len(df_synthetic)} synthetic pairs")
-print(f"\nTransformation distribution:")
+print("\nTransformation distribution:")
 print(df_synthetic['num_transformations'].value_counts())
 
-print(f"\nRule frequency:")
+print("\nRule frequency:")
 all_rules = ','.join(df_synthetic['rules_applied']).split(',')
-from collections import Counter
 rule_counts = Counter(all_rules)
 for rule, count in rule_counts.most_common():
     print(f"  {rule}: {count}")
@@ -45,10 +45,10 @@ for rule, count in rule_counts.most_common():
 # Save
 df_synthetic.to_csv('data/raw/synthetic_pairs.csv', index=False)
 
-print(f"\n✅ Synthetic pairs saved to: data/raw/synthetic_pairs.csv")
+print("\n✅ Synthetic pairs saved to: data/raw/synthetic_pairs.csv")
 
 # Show samples
-print(f"\nSample pairs:")
+print("\nSample pairs:")
 for i in range(min(5, len(df_synthetic))):
     row = df_synthetic.iloc[i]
     print(f"\n{i+1}. SA:  {row['source']}")

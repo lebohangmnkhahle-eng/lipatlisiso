@@ -1,7 +1,6 @@
 # data_processor.py
 
 import pandas as pd
-from collections import Counter
 
 def load_all_data():
     """Combine all data sources"""
@@ -15,7 +14,7 @@ def load_all_data():
     # Web (if available)
     try:
         df_web = pd.read_csv('data/raw/web_crawled.csv')
-    except:
+    except Exception:
         df_web = pd.DataFrame()
 
     # Combine
@@ -75,7 +74,7 @@ train.to_csv('data/splits/train.tsv', sep='\t', index=False)
 val.to_csv('data/splits/val.tsv', sep='\t', index=False)
 test.to_csv('data/splits/test.tsv', sep='\t', index=False)
 
-print(f"\nSplits:")
+print("\nSplits:")
 print(f"  Train: {len(train)}")
 print(f"  Val: {len(val)}")
 print(f"  Test: {len(test)}")

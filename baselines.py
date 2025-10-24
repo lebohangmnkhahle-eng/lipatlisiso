@@ -1,16 +1,17 @@
 # baselines.py
 
+import torch
+import torch.nn as nn
+from rule_based_normalizer import SesothoNormalizer
+
 # 1. Identity Baseline (trivial)
 def identity_baseline(source):
     return source
 
 # 2. Rule-based (already implemented)
-from rule_based_normalizer import SesothoNormalizer
 normalizer = SesothoNormalizer()
 
 # 3. LSTM Baseline
-import torch
-import torch.nn as nn
 
 class LSTMSeq2Seq(nn.Module):
     def __init__(self, vocab_size, embedding_dim=128, hidden_dim=256):

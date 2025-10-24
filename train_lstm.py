@@ -59,7 +59,7 @@ def train_lstm_model():
     train_dataset = SesothoDataset(train_df, vocab)
     val_dataset = SesothoDataset(val_df, vocab)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, collate_fn=collate_fn)
-    val_loader = DataLoader(val_dataset, batch_size=32, collate_fn=collate_fn)
+    DataLoader(val_dataset, batch_size=32, collate_fn=collate_fn)
 
     # Initialize model
     model = LSTMSeq2Seq(vocab_size)

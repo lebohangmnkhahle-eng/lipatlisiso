@@ -5,6 +5,8 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
+import pandas as pd
+from difflib import SequenceMatcher
 
 class BilingualCrawler:
     def __init__(self, seed_urls):
@@ -75,10 +77,6 @@ class BilingualCrawler:
                 continue
 
         return self.sesotho_pages
-
-import re
-import pandas as pd
-from difflib import SequenceMatcher
 
 def load_seed_urls(filepath='bilingual_sites.txt'):
     urls = []

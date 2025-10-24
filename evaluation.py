@@ -16,7 +16,6 @@ class Evaluator:
         For full BLEU, use sacrebleu library
         """
         total_precision = 0
-        total_brevity = 0
 
         for pred, ref in zip(predictions, references):
             pred_words = pred.split()
