@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 @dataclass
 class Financials:
@@ -21,3 +21,16 @@ class MSME:
     financials: Financials
     credit_score: Optional[int] = None
     risk_category: Optional[str] = None
+
+@dataclass
+class DirectoryListing:
+    name: str
+    sector: str
+    location: str
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    social_links: Dict[str, str] = field(default_factory=dict)
+    description: Optional[str] = None
+    source_url: str = ""
+    scraped_at: str = ""
