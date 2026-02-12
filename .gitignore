@@ -1,6 +1,7 @@
 # Data files
 data/
 results/
+mafisa_insights/data/
 
 # Model checkpoints and saved models
 checkpoints/
@@ -13,3 +14,6 @@ __pycache__/
 # Figures and logs
 figures/
 *.log
+
+# Reports
+Weekly_Insights_Report.md
